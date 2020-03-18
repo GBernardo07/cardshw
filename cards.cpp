@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 
 // Cards defined as structs with suits and ranks
 struct Card {
@@ -25,39 +26,39 @@ std::ostream& operator<<( std::ostream& os, const Card & c ) {
 }
 
 // Read cards from standard input and store them in vector
-void read_cards(Card *vector) {
+void read_cards(std::vector<Card> &hand ) {
 
-    short suit;
-    for (int i{0}; std::cin >> suit; ++i) {
+    Card c;
+    short suit, rank;
+    while (std::cin >> suit >> rank) {
         switch (suit) {
             case 0:
-                vector[i].s = Card::suit::clubs;
+                c.s = Card::suit::clubs;
                 break;
             case 1:
-                vector[i].s = Card::suit::diamonds;
+                c.s = Card::suit::diamonds;
                 break;
             case 2:
-                vector[i].s = Card::suit::hearts;
+                c.s = Card::suit::hearts;
                 break;
             case 3:
-                vector[i].s = Card::suit::spades;
+                c.s = Card::suit::spades;
                 break;
             default:
                 return ;
         }
-        std::cin >> vector[i].r;
+        c.r = rank;
+        hand.push_back(c);
     }
-
 }
 
-// TOFIX
-void print_cards(Card *first, Card *last) {
+// Print cards from vector
+void print_cards(const std::vector<Card> hand ) {
 
     std::cout << "Cards are: " << "[ ";
-    for (Card *pointer{first}; pointer != last; ++pointer)
-        std::cout << *pointer << " ";
+    for (uint i{0}; i < hand.size(); ++i)
+        std::cout << hand[i] << " // ";
     std::cout << " ]" << std::endl;
-
 }
 
 // TODO
@@ -73,7 +74,7 @@ Card* find_if( Card *first, Card *last, bool (condition)(Card) ) {
 }
 
 // Checks if the card is red
-bool is_red(Card c) {
+bool is_red(const Card c) {
 
     if (c.s == Card::suit::hearts || c.s == Card::suit::diamonds)
         return true; 
@@ -81,7 +82,7 @@ bool is_red(Card c) {
 }
 
 // Checks if the card is a figured rank
-bool is_figure(Card c) {
+bool is_figure(const Card c) {
 
     if (c.r >= 11)
         return true;
@@ -91,19 +92,23 @@ bool is_figure(Card c) {
 int main(void)
 {
 
-    Card hand[20];
+    Card *first, *last;
+    std::vector<Card> hand;
     bool (*function)(Card);
 
     read_cards(hand);
-    // print_cards(hand, std::end(hand));
+    print_cards(hand);
+
+    first = &hand.front();
+    last = &hand.back();
 
     // Finding first red card
     function = is_red;
-    std::cout << "First red card: " << *(find_if(hand, std::end(hand), function)) << std::endl;
+    std::cout << "First red card: " << *(find_if(first, last, function)) << std::endl;
 
     // Finding first figured card
     function = is_figure;
-    std::cout << "First figured card: " << *(find_if(hand, std::end(hand), function)) << std::endl;
+    std::cout << "First figured card: " << *(find_if(first, last, function)) << std::endl;
 
     return 0;
 }
